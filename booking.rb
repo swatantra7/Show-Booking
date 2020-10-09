@@ -9,14 +9,27 @@ class Booking
     @gold_seats= []
     @silver_seats = []
     1.upto(NUMBER_OF_SHOW) do |index|
-      @plantinium_seats[index] = {"320" => %w(A1 A2 A3 A4 A5 A6 A7 A8 A9)}
-      @gold_seats[index] = {"280" => %w(B1 B2 B3 B4 B5 B6)}
-      @silver_seats[index] = {"240" => %w(C2 C3 C4 C5 C6 C7)}
+      @plantinium_seats[index] = {"320" => platinum_seats_arr[index]}
+      @gold_seats[index] = {"280" => gold_seats_arr[index]}
+      @silver_seats[index] = {"240" => silver_seats_arr[index]}
     end
+  end
+
+  def platinum_seats_arr
+    {1 => %w(A1 A2 A3 A4 A5 A6 A7 A8 A9), 2 => %w(A1 A2 A3 A4 A5 A6 A7), 3 => %w(A1 A2 A3 A4 A5)}
+  end
+
+  def gold_seats_arr
+    {1 => %w(B1 B2 B3 B4 B5 B6), 2 => %w(B2 B3 B4 B5 B6), 3 => %w(B1 B2 B3 B4 B5 B6 B7 B8)}
+  end
+
+  def silver_seats_arr
+    {1 => %w(C2 C3 C4 C5 C6 C7), 2 => %w(C1 C2 C3 C4 C5 C6 C7), 3 => %w(C1 C2 C3 C4 C5 C6 C7 C8 C9)}
   end
 
   def book_now
     print_message
+    puts instructions
     show_no = take_show_input
     if check_avaliality(show_no)
       seat_no = take_seat_input(show_no)
@@ -41,7 +54,6 @@ class Booking
   end
 
   def take_show_input
-    puts instructions
     puts "Please enter Show Number"
     show_no = gets.chomp.to_i
     if show_no >=1 && show_no <=3
@@ -56,13 +68,13 @@ class Booking
     puts "*********************************************************"
     puts "charged Cost For Booking #{total_amount.round(2)}"
     puts ""
-    puts "Revenue: Rs #{revenue_generated(ps, gs, bss)}"
+    puts "Revenue: Rs #{revenue_generated(ps, gs, bss).round(2)}"
     puts
-    puts "Service Tax Rs:#{service_taxes(ps, gs, bss)}"
+    puts "Service Tax Rs:#{service_taxes(ps, gs, bss).round(2)}"
     puts
-    puts "Swachh Bharat Cess:#{swachh_bharat_cess_taxes(ps,gs, bss)}"
+    puts "Swachh Bharat Cess:#{swachh_bharat_cess_taxes(ps,gs, bss).round(2)}"
     puts
-    puts "Krishi Kalyan Cess: #{krishi_kalyan_tax_percentage(ps, gs, bss)}"
+    puts "Krishi Kalyan Cess: #{krishi_kalyan_tax_percentage(ps, gs, bss).round(2)}"
     puts
     puts "*********************************************************"
   end
@@ -86,9 +98,11 @@ class Booking
   def calculate_booking_cost(ps, gs, bss)
     total_amount = 0
     if ps.values.first.zero? && gs.values.first.zero? && bss.values.first.zero?
-      puts "Invalid Seats, Please Try Again"
+      puts "Opps!!, Invalid Seats, Please Try Again"
+      puts "+++++++++++++++++++++++++++++++++++++++++++"
+      book_now
     else
-      total_amount = [ps, gs,gs].map{|seat_detail| seat_detail.values.first*seat_detail.keys.first+ seat_detail.values.first*(seat_detail.keys.first*service_tax_percentage/100) + seat_detail.values.first*(seat_detail.keys.first*krishi_kalyan_percentage/100) + seat_detail.values.first*(seat_detail.keys.first*swachh_bharat_cess/100)}.sum
+      total_amount = [ps, gs,bss].map{|seat_detail| seat_detail.values.first*seat_detail.keys.first+ seat_detail.values.first*(seat_detail.keys.first*service_tax_percentage/100) + seat_detail.values.first*(seat_detail.keys.first*krishi_kalyan_percentage/100) + seat_detail.values.first*(seat_detail.keys.first*swachh_bharat_cess/100)}.sum
     end
     total_amount
   end
@@ -105,7 +119,7 @@ class Booking
 
   def take_seat_input(show_no)
     puts "Please Enter Seat No"
-    seat_nos = gets.chomp.split(',')
+    seat_nos = gets.chomp.split(',').map(&:strip)
     seat_nos
   end
 
@@ -126,7 +140,7 @@ class Booking
         booked_gold_sheet += 1
       elsif is_silver?(show_no, seat_no)
         silver_sheet_cost = silver_seats[show_no].keys[0]
-        silver_sheet_cost_left_sheets = silver_sheet[show_no].values.flatten! - [seat_no]
+        silver_sheet_cost_left_sheets = silver_seats[show_no].values.flatten! - [seat_no]
         silver_seats[show_no][silver_sheet_cost] = silver_sheet_cost_left_sheets
         booked_silver_sheet += 1
       end
