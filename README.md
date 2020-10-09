@@ -27,9 +27,8 @@ No background jobs added yet.
 
   * ruby booking.rb
 
-Testing Report:
-
 ```
+# Testing Report:
 Seating arrangement:
 =========================================
 Show 1 Running in Audi 1
