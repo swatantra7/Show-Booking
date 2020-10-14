@@ -38,6 +38,18 @@ class Booking
     total_amount = calculate_booking_cost(ps, gs, bss)
     print_slip(ps, gs, bss, total_amount)
     print_message
+    if total_amount.zero?
+      puts "Opps!!, Invalid Seats, Please Try Again"
+      puts "+++++++++++++++++++++++++++++++++++++++++++"
+      book_now
+    end
+    puts "Do You want to Continue Press Y or press any key to exit"
+    input = gets.chomp.downcase.to_s
+    if input == 'y'
+      book_now
+    else
+      return
+    end
   end
 
   def print_message
@@ -98,9 +110,7 @@ class Booking
   def calculate_booking_cost(ps, gs, bss)
     total_amount = 0
     if ps.values.first.zero? && gs.values.first.zero? && bss.values.first.zero?
-      puts "Opps!!, Invalid Seats, Please Try Again"
-      puts "+++++++++++++++++++++++++++++++++++++++++++"
-      book_now
+      total_amount
     else
       total_amount = [ps, gs,bss].map{|seat_detail| seat_detail.values.first*seat_detail.keys.first+ seat_detail.values.first*(seat_detail.keys.first*service_tax_percentage/100) + seat_detail.values.first*(seat_detail.keys.first*krishi_kalyan_percentage/100) + seat_detail.values.first*(seat_detail.keys.first*swachh_bharat_cess/100)}.sum
     end
